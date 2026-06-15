@@ -2,3 +2,4 @@ name: zmk-config-aekeynox
 build:
   settings:
     dts_root: .
+    board_root: .
