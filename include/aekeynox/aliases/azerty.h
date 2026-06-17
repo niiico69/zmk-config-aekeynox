@@ -97,7 +97,7 @@
 #define S_LPAR             &kp N5
 #define S_RPAR             &kp MINUS
 #define S_RBRC  OS_SELECT( &kp RA(EQUAL) ,, &kp RA(MINUS) ,               )
-#define S_EQUAL            &kp EQUAL
+#define S_EQUAL OS_SELECT( &kp EQUAL     ,, &kp FSLH      ,               )
 #define S_BSLH  OS_SELECT( &kp RA(N8)    ,, &kp SA(DOT)   ,               )
 #define S_PLUS  OS_SELECT( &kp PLUS      ,, &kp QMARK     ,               )
 #define S_MINUS OS_SELECT( &kp N6        ,, &kp EQUAL     ,               )
