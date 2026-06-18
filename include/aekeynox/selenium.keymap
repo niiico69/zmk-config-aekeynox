@@ -45,6 +45,14 @@
       )>;
     };
 
+#ifdef KB_DUAL_NATIVE_EMUL
+    // 0b. Emulated ErgoL base, slipped in at layer index 1. Its body lives in
+    //     ergol.dtsi: this first, guarded include emits ONLY the emul_base node
+    //     here (see EMUL_BASE_EMITTED there); the include at the end of this
+    //     file then emits the remaining (1dk) layers.
+    #include "emulations/ergol.dtsi"
+#endif
+
     // 1. NumLock layer -- a NavNum layer that stays on until deactivated without holding any key
     num_lock_layer: num_lock_layer {
       display-name = "NumLock";
@@ -113,9 +121,9 @@
     fn_media_layer: fn_media_layer {
       display-name = "FnMedia";
       bindings = <SELENIUM_KEYMAP_BINDINGS(
-        &trans  ,  &kp F1  &kp F2  &kp F3  &kp F4  &out OUT_BLE ,   &bt BT_SEL 2  &kp C_NEXT  &kp C_VOL_UP  &kp C_BRI_UP   &kp SLCK      ,  &trans ,
-        &trans  ,  &kp F5  &kp F6  &kp F7  &kp F8  &out OUT_USB ,   &bt_sel1_clr  H_J C_PP    H_K C_MUTE    H_L C_AL_LOCK  H_SEMI PSCRN  ,  &trans ,
-        &trans  ,  &kp F9  &kp F10 &kp F11 &kp F12 &out OUT_TOG ,   &bt BT_SEL 0  &kp C_PREV  &kp C_VOL_DN  &kp C_BRI_DN   &kp INS       ,  &trans ,
+        &trans  ,  &kp F1  &kp F2  &kp F3  &kp F4  MODE_TOGGLE  ,   &bt BT_SEL 2  &kp C_NEXT  &kp C_VOL_UP  &kp C_BRI_UP   &kp SLCK      ,  &trans ,
+        &trans  ,  &kp F5  &kp F6  &kp F7  &kp F8  &out OUT_TOG ,   &bt_sel1_clr  H_J C_PP    H_K C_MUTE    H_L C_AL_LOCK  H_SEMI PSCRN  ,  &trans ,
+        &trans  ,  &kp F9  &kp F10 &kp F11 &kp F12 &none        ,   &bt BT_SEL 0  &kp C_PREV  &kp C_VOL_DN  &kp C_BRI_DN   &kp INS       ,  &trans ,
                            &trans , &bootloader , &trans   ,   &trans , &sys_reset , &studio_unlock
       )>;
     };

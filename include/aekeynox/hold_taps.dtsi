@@ -21,6 +21,32 @@
 // Make sure this stays equal to <index_of_last_layer> + 1
 #define EXTRA_LAYERS_START_INDEX 7
 
+// Runtime native(AZERTY)/emulation(ErgoL) toggle. Both modes run on an AZERTY
+// host, so EVERY symbol/nav/fn layer is shared as-is (same alias context) — only
+// the base alpha and the accent (1dk) layers differ. emul_base is slipped in at
+// index 1, just above the native base: a held functional layer (index >= 2)
+// always outranks it, so there is no shadowing. One &tog key flips the mode.
+#ifdef KB_DUAL_NATIVE_EMUL
+  #define EMUL_BASE_LAYER 1
+  #undef  NUM_LOCK_LAYER
+  #define NUM_LOCK_LAYER  2
+  #undef  SYMBOLS_LAYER
+  #define SYMBOLS_LAYER   3
+  #undef  VIM_NAV_LAYER
+  #define VIM_NAV_LAYER   4
+  #undef  NAV_NUM_LAYER
+  #define NAV_NUM_LAYER   5
+  #undef  NUM_ROW_LAYER
+  #define NUM_ROW_LAYER   6
+  #undef  FN_MEDIA_LAYER
+  #define FN_MEDIA_LAYER  7
+  #undef  EXTRA_LAYERS_START_INDEX
+  #define EXTRA_LAYERS_START_INDEX 8
+  #define MODE_TOGGLE &tog EMUL_BASE_LAYER
+#else
+  #define MODE_TOGGLE &none
+#endif
+
 
 /**
  * Home Row
@@ -341,8 +367,8 @@
     OMIT_IF_NO_REF nm6: nm6 { compatible = "zmk,behavior-mod-morph"; #binding-cells = <0>; mods = <(MOD_LSFT|MOD_RSFT)>; bindings = <&kp LS(N6)>, <S_CARET>; };
     OMIT_IF_NO_REF nm7: nm7 { compatible = "zmk,behavior-mod-morph"; #binding-cells = <0>; mods = <(MOD_LSFT|MOD_RSFT)>; bindings = <&kp LS(N7)>, <S_AMPS>; };
     OMIT_IF_NO_REF nm8: nm8 { compatible = "zmk,behavior-mod-morph"; #binding-cells = <0>; mods = <(MOD_LSFT|MOD_RSFT)>; bindings = <&kp LS(N8)>, <S_STAR>; };
-    OMIT_IF_NO_REF nm9: nm9 { compatible = "zmk,behavior-mod-morph"; #binding-cells = <0>; mods = <(MOD_LSFT|MOD_RSFT)>; bindings = <&kp LS(N9)>, <S_LPAR>; };
-    OMIT_IF_NO_REF nm0: nm0 { compatible = "zmk,behavior-mod-morph"; #binding-cells = <0>; mods = <(MOD_LSFT|MOD_RSFT)>; bindings = <&kp LS(N0)>, <S_RPAR>; };
+    OMIT_IF_NO_REF nm9: nm9 { compatible = "zmk,behavior-mod-morph"; #binding-cells = <0>; mods = <(MOD_LSFT|MOD_RSFT)>; bindings = <&kp LS(N9)>, <S_HASH>; };
+    OMIT_IF_NO_REF nm0: nm0 { compatible = "zmk,behavior-mod-morph"; #binding-cells = <0>; mods = <(MOD_LSFT|MOD_RSFT)>; bindings = <&kp LS(N0)>, <S_AT>; };
   };
 };
   #undef S_N1
