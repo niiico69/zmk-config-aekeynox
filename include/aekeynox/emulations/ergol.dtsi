@@ -23,6 +23,7 @@
 
     // PASS 1 — bare node (we are already inside the keymap node). Outer columns
     // are &trans so Tab/Esc/Shift/etc. fall through to the native base below.
+#ifdef KB_LAYOUT_AZERTY
     emul_base_layer: emul_base_layer {
       display-name = "ErgoL/em";
       bindings = <SELENIUM_KEYMAP_BINDINGS(
@@ -32,12 +33,29 @@
                LTHUMB_TUCK , LTHUMB_HOME , LTHUMB_REACH   ,   RTHUMB_REACH , RTHUMB_HOME , RTHUMB_TUCK
       )>;
     };
+#elif defined KB_LAYOUT_QWERTY_INTL
+    emul_base_layer: emul_base_layer {
+      display-name = "ErgoL/em";
+      bindings = <SELENIUM_KEYMAP_BINDINGS(
+        &trans  ,  &kp Q  &kp C  &kp O  &kp P  &kp W   ,   &kp J  &kp M    &kp D  &apos  &kp Y     ,  &trans ,
+        &trans  ,  H_A A  H_S S  H_D E  H_F N  &kp F   ,   &kp L  H_J R    H_K T  H_L I  H_SEMI U  ,  &trans ,
+        &trans  ,  &kp Z  &kp X  &dash  &kp V  &kp B   ,   &dot   &kp H    &kp G  &comma &kp K     ,  &trans ,
+               LTHUMB_TUCK , LTHUMB_HOME , LTHUMB_REACH   ,   RTHUMB_REACH , RTHUMB_HOME , RTHUMB_TUCK
+      )>;
+    };
+#else
+  #error "KB_DUAL_NATIVE_EMUL requires either KB_LAYOUT_AZERTY or KB_LAYOUT_QWERTY_INTL"
+#endif
 
 #else // EMUL_BASE_EMITTED — PASS 2: emul punctuation behaviors + the ErgoL accent layers
 
 #define ODK_LAYER       EXTRA_LAYERS_START_INDEX        // 8
 #define ODK_SHIFT_LAYER (EXTRA_LAYERS_START_INDEX + 1)  // 9
+#ifdef KB_LAYOUT_AZERTY
 #define K_DIA &kp LBRC                                  // diaeresis (AZERTY)
+#elif defined KB_LAYOUT_QWERTY_INTL
+#define K_DIA &kp DQT                                   // diaeresis (QWERTY-intl)
+#endif
 
 / {
   behaviors {
