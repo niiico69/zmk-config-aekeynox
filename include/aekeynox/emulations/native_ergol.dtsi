@@ -1,0 +1,187 @@
+// native_ergol.dtsi — runtime toggle to native ErgoL mode.
+//
+// "Native ErgoL" means the host OS has the ErgoL layout driver installed.
+// The keyboard sends standard QWERTY positional keycodes; the driver maps them
+// to ErgoL characters. This is distinct from "emulated ErgoL" (ergol.dtsi)
+// where the keyboard itself does the remapping on a bare AZERTY host.
+//
+// Included TWICE from selenium.keymap (same two-pass trick as ergol.dtsi):
+//   PASS 1 (inside keymap node, after emul_base_layer):
+//     Emits native_ergol_base_layer at index NATIVE_ERGOL_BASE_LAYER (2).
+//     Alpha + HRMs are identical to base_layer (QWERTY keycodes); only the
+//     thumb layer-taps differ, routing to the native-ErgoL functional layers.
+//   PASS 2 (file scope, end of selenium.keymap, after all AZERTY layers):
+//     Rebinds S_xxx / X_xxx to ergol.h values, then emits:
+//       - native_ergol_sym_layer  (index NATIVE_ERGOL_SYM_LAYER = 9)
+//       - native_ergol_nav_layer  (index NATIVE_ERGOL_NAV_LAYER = 10)
+//
+// Requires (in settings.h):
+//   #define KB_LAYOUT_AZERTY
+//   #define KB_EMULATION_ERGOL
+//   #define KB_DUAL_NATIVE_EMUL
+//   #define KB_TRIPLE_NATIVE_EMUL
+
+#ifdef KB_TRIPLE_NATIVE_EMUL
+
+#ifndef NATIVE_ERGOL_BASE_EMITTED
+#define NATIVE_ERGOL_BASE_EMITTED
+
+// ─── PASS 1: native ErgoL base layer ─────────────────────────────────────────
+
+    // Same thumb semantics as base_layer: hold-home = nav, tuck = symbols morph.
+    // ponytail: assumes HT_HOME_ROW_MODS without VIM_NAVIGATION/LEFT_HAND_SPACE
+    // (the settings actually in use); mirror those variants here if ever needed.
+    native_ergol_base_layer: native_ergol_base_layer {
+      display-name = "ErgoL/nat";
+      bindings = <SELENIUM_KEYMAP_BINDINGS(
+        &kp TAB    ,  &kp Q  &kp W  &kp E  &kp R  &kp T   ,   &kp Y  &kp U  &kp I     &kp O   &kp P     ,  &kp BACKSPACE ,
+        &kp ESCAPE ,  HRM_A  HRM_S  HRM_D  HRM_F  &kp G   ,   &kp H  HRM_J  HRM_K     HRM_L   HRM_SEMI  ,  &kp ENTER     ,
+        &kp LSHIFT ,  &kp Z  &kp X  &kp C  &kp V  &kp B   ,   &kp N  &kp M  &kp COMMA &kp DOT &kp FSLH  ,  &kp RSHIFT    ,
+               LTHUMB_TUCK , NAV_SC NATIVE_ERGOL_NAV_LAYER BACKSPACE , LTHUMB_REACH   ,   RTHUMB_REACH , &lt NATIVE_ERGOL_NAV_LAYER SPACE , &sym_shift_altgr_nat
+      )>;
+    };
+
+#else // NATIVE_ERGOL_BASE_EMITTED
+
+// ─── PASS 2: ErgoL-aliased functional layers ─────────────────────────────────
+// Rebind all S_xxx / X_xxx from azerty.h to ergol.h, then emit the
+// native-ErgoL symbols and nav layers.
+
+// Symbol aliases
+#undef S_CARET
+#undef S_LT
+#undef S_GT
+#undef S_DLLR
+#undef S_PRCNT
+#undef S_AT
+#undef S_AMPS
+#undef S_STAR
+#undef S_SQT
+#undef S_GRAVE
+#undef S_LBRC
+#undef S_LPAR
+#undef S_RPAR
+#undef S_RBRC
+#undef S_EQUAL
+#undef S_BSLH
+#undef S_PLUS
+#undef S_MINUS
+#undef S_FSLH
+#undef S_DQT
+#undef S_TILDE
+#undef S_LBKT
+#undef S_RBKT
+#undef S_UNDER
+#undef S_HASH
+#undef S_PIPE
+#undef S_EXCL
+#undef S_SEMI
+#undef S_COLON
+#undef S_QMARK
+#undef S_COMMA
+#undef S_DOT
+#undef S_MONEY
+
+// Shortcut aliases (differ between AZERTY and ErgoL host)
+#undef X_UNDO
+#undef X_CUT
+#undef X_COPY
+#undef X_PASTE
+#undef X_REDO
+#undef X_CTL_W
+#undef X_SAVE
+#undef X_ALL
+
+// Number aliases (AZERTY uses Shift+digit; ErgoL host uses plain digits)
+#undef S_N0
+#undef S_N1
+#undef S_N2
+#undef S_N3
+#undef S_N4
+#undef S_N5
+#undef S_N6
+#undef S_N7
+#undef S_N8
+#undef S_N9
+
+#include "../aliases/ergol.h"
+
+#define S_N0 &kp N0
+#define S_N1 &kp N1
+#define S_N2 &kp N2
+#define S_N3 &kp N3
+#define S_N4 &kp N4
+#define S_N5 &kp N5
+#define S_N6 &kp N6
+#define S_N7 &kp N7
+#define S_N8 &kp N8
+#define S_N9 &kp N9
+
+/ {
+  behaviors {
+    // &tog restricted to switching a layer off (toggle-mode), used to make the
+    // two mode keys mutually exclusive.
+    tog_off: tog_off {
+      compatible = "zmk,behavior-toggle-layer";
+      #binding-cells = <1>;
+      toggle-mode = "off";
+    };
+
+    // tuck-thumb symbols morph, same as sym_shift_altgr but targeting the
+    // native-ErgoL symbols layer
+    sym_shift_altgr_nat: sym_shift_altgr_nat {
+      compatible = "zmk,behavior-mod-morph";
+      #binding-cells = <0>;
+      bindings = <&EZ_SL(NATIVE_ERGOL_SYM_LAYER)>, <&EZ_SK(RS(RALT))>;
+      mods = <(MOD_LSFT|MOD_RSFT)>;
+    };
+  };
+
+  macros {
+    // Exclusive mode keys: switch the other mode off, then toggle own mode.
+    // Press once = enter mode, press again = back to AZERTY.
+    mode_emul: mode_emul {
+      compatible = "zmk,behavior-macro";
+      #binding-cells = <0>;
+      bindings = <&tog_off NATIVE_ERGOL_BASE_LAYER &tog EMUL_BASE_LAYER>;
+    };
+    mode_nat: mode_nat {
+      compatible = "zmk,behavior-macro";
+      #binding-cells = <0>;
+      bindings = <&tog_off EMUL_BASE_LAYER &tog NATIVE_ERGOL_BASE_LAYER>;
+    };
+  };
+
+  keymap {
+    compatible = "zmk,keymap";
+
+    // ErgoL symbols layer: same layout as symbols_layer but with ergol.h keycodes.
+    native_ergol_sym_layer: native_ergol_sym_layer {
+      display-name = "Sym/ErgoL";
+      bindings = <SELENIUM_KEYMAP_BINDINGS(
+        &trans  ,  S_CARET S_LT    S_GT    S_DLLR  S_PRCNT   ,   S_AT    S_AMPS  S_STAR  S_SQT   S_GRAVE  ,  &trans ,
+        &trans  ,  S_LBRC  S_LPAR  S_RPAR  S_RBRC  S_EQUAL   ,   S_BSLH  S_PLUS  S_MINUS S_FSLH  S_DQT    ,  &trans ,
+        &trans  ,  S_TILDE S_LBKT  S_RBKT  S_UNDER S_HASH    ,   S_PIPE  S_EXCL  S_SEMI  S_COLON S_QMARK  ,  &trans ,
+        &EZ_SL(NATIVE_ERGOL_NAV_LAYER) , &kp SPACE , &kp ENTER   ,   &trans , &trans , &trans
+      )>;
+    };
+
+    // ErgoL nav+num layer: same layout as nav_num_layer but with ergol.h shortcuts
+    // and unshifted number keycodes.
+    // ponytail: no NumLock in native mode (shared num_lock_layer is AZERTY-aliased);
+    // duplicate it with ergol.h aliases if the sticky numpad is ever missed.
+    native_ergol_nav_layer: native_ergol_nav_layer {
+      display-name = "Nav/ErgoL";
+      bindings = <SELENIUM_KEYMAP_BINDINGS(
+        &trans  ,  &kp ESC  &kp HOME &kp UP   &kp END   &kp PG_UP   ,   &none    S_N7  S_N8  S_N9  S_FSLH  ,  &trans ,
+        &trans  ,  X_ALL    &kp LEFT &kp DOWN &kp RIGHT &kp PG_DN   ,   S_MINUS  S_N4  S_N5  S_N6  S_N0    ,  &trans ,
+        &trans  ,  X_UNDO   X_CUT    X_COPY   X_PASTE   X_REDO      ,   S_COMMA  S_N1  S_N2  S_N3  S_DOT   ,  &trans ,
+      NAV_LTHUMB_TUCK , &sc FN_MEDIA_LAYER DEL , NAV_LTHUMB_REACH   ,   &kp ESCAPE , &lt FN_MEDIA_LAYER LS(SPACE) , &EZ_LSK(RALT)
+      )>;
+    };
+
+  };
+};
+
+#endif // NATIVE_ERGOL_BASE_EMITTED
+#endif // KB_TRIPLE_NATIVE_EMUL

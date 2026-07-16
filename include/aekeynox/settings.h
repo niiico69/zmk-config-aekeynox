@@ -42,6 +42,16 @@
 // #define KB_EMULATION_ERGOL            // host: QWERTY-intl or AZERTY
 // #define KB_EMULATION_QWERTY_LAFAYETTE // host: QWERTY-intl or AZERTY
 
+// [Experimental] Runtime tri-mode toggle: AZERTY native / ErgoL emulated / ErgoL native.
+// "ErgoL native" = host has the ErgoL layout driver installed; the keyboard sends
+// QWERTY positional keycodes and the driver does the mapping.
+// Requires all four defines below to be active simultaneously.
+// Toggle keys on FnMedia layer: F4-col = emul ErgoL, F12-col = native ErgoL.
+// #define KB_LAYOUT_AZERTY
+// #define KB_EMULATION_ERGOL
+// #define KB_DUAL_NATIVE_EMUL
+// #define KB_TRIPLE_NATIVE_EMUL
+
 // [Experimental] Runtime native(AZERTY)/emulation(ErgoL) toggle.
 // Both modes run on an AZERTY host:
 //  - native    = positional base, the HOST does the layout (plain AZERTY, or
@@ -52,9 +62,9 @@
 // Only the base alpha + the 1dk accent layers differ; symbols/nav/numrow/fn are
 // shared. Layer state is volatile: a reboot lands on native AZERTY.
 // Requires KB_LAYOUT_AZERTY + KB_EMULATION_ERGOL.
-#define KB_LAYOUT_AZERTY
 #define KB_EMULATION_ERGOL
 #define KB_DUAL_NATIVE_EMUL
+#define KB_TRIPLE_NATIVE_EMUL
 
 // [Experimental]
 // Uncomment the following line for an extended character support on Windows.

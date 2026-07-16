@@ -21,12 +21,43 @@
 // Make sure this stays equal to <index_of_last_layer> + 1
 #define EXTRA_LAYERS_START_INDEX 7
 
-// Runtime native(AZERTY)/emulation(ErgoL) toggle. Both modes run on an AZERTY
-// host, so EVERY symbol/nav/fn layer is shared as-is (same alias context) — only
-// the base alpha and the accent (1dk) layers differ. emul_base is slipped in at
-// index 1, just above the native base: a held functional layer (index >= 2)
-// always outranks it, so there is no shadowing. One &tog key flips the mode.
-#ifdef KB_DUAL_NATIVE_EMUL
+// Runtime base-layer toggle(s).
+//
+// KB_DUAL_NATIVE_EMUL — two bases: AZERTY native (0) + ErgoL emulated (1).
+//   All functional layers are shared (same AZERTY alias context).
+//
+// KB_TRIPLE_NATIVE_EMUL — three bases: AZERTY native (0) + ErgoL emulated (1)
+//   + ErgoL native (2, host has ErgoL driver). Adds dedicated sym + nav layers
+//   for the native ErgoL context. Requires KB_DUAL_NATIVE_EMUL + KB_EMULATION_ERGOL.
+
+#ifdef KB_TRIPLE_NATIVE_EMUL
+  #if !defined KB_DUAL_NATIVE_EMUL || !defined KB_EMULATION_ERGOL || !defined KB_LAYOUT_AZERTY
+    #error "KB_TRIPLE_NATIVE_EMUL requires KB_LAYOUT_AZERTY + KB_EMULATION_ERGOL + KB_DUAL_NATIVE_EMUL"
+  #endif
+  #define EMUL_BASE_LAYER           1
+  #define NATIVE_ERGOL_BASE_LAYER   2
+  #undef  NUM_LOCK_LAYER
+  #define NUM_LOCK_LAYER            3
+  #undef  SYMBOLS_LAYER
+  #define SYMBOLS_LAYER             4
+  #undef  VIM_NAV_LAYER
+  #define VIM_NAV_LAYER             5
+  #undef  NAV_NUM_LAYER
+  #define NAV_NUM_LAYER             6
+  #undef  NUM_ROW_LAYER
+  #define NUM_ROW_LAYER             7
+  #undef  FN_MEDIA_LAYER
+  #define FN_MEDIA_LAYER            8
+  // 9-10: the 1dk layers from ergol.dtsi (declared before native_ergol.dtsi pass 2)
+  #undef  EXTRA_LAYERS_START_INDEX
+  #define EXTRA_LAYERS_START_INDEX  9
+  #define NATIVE_ERGOL_SYM_LAYER   11
+  #define NATIVE_ERGOL_NAV_LAYER   12
+  // exclusive mode keys (macros in native_ergol.dtsi): each turns the other
+  // mode off, then toggles its own -> press again = back to AZERTY
+  #define MODE_TOGGLE        &mode_emul
+  #define MODE_TOGGLE_NATIVE &mode_nat
+#elif defined KB_DUAL_NATIVE_EMUL
   #define EMUL_BASE_LAYER 1
   #undef  NUM_LOCK_LAYER
   #define NUM_LOCK_LAYER  2
@@ -42,9 +73,11 @@
   #define FN_MEDIA_LAYER  7
   #undef  EXTRA_LAYERS_START_INDEX
   #define EXTRA_LAYERS_START_INDEX 8
-  #define MODE_TOGGLE &tog EMUL_BASE_LAYER
+  #define MODE_TOGGLE        &tog EMUL_BASE_LAYER
+  #define MODE_TOGGLE_NATIVE &none
 #else
-  #define MODE_TOGGLE &none
+  #define MODE_TOGGLE        &none
+  #define MODE_TOGGLE_NATIVE &none
 #endif
 
 
