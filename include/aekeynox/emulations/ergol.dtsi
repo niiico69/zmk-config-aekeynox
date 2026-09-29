@@ -21,10 +21,17 @@
  * Base Layer (host-specific)
 ******************************************************************************/
 
+// With KB_DUAL_NATIVE_EMUL, the native base is kept and ErgoL goes to the
+// emulated base layer, toggled at runtime (see MODE_TOGGLE).
+#ifdef KB_DUAL_NATIVE_EMUL
+  #define ERGOL_BASE emul_base_layer
+#else
+  #define ERGOL_BASE base_layer
+#endif
+
 #ifdef KB_LAYOUT_AZERTY
 
-  &base_layer {
-    display-name = "Base";
+  &ERGOL_BASE {
     bindings = <SELENIUM_KEYMAP_BINDINGS(
       &kp LTOP   ,  &kp A  &kp C  &kp O  &kp P  &kp Z   ,   &kp J  &kp SEMI &kp D  &apos  &kp Y  ,  &kp RTOP   ,
       &kp LHOME  ,  &H4 Q  &H3 S  &H2 E  &H1 N  &kp F   ,   &kp L  &H1 R    &H2 T  &H3 I  &H4 U  ,  &kp RHOME  ,
@@ -36,8 +43,7 @@
 
 #elif defined KB_LAYOUT_QWERTY_INTL
 
-  &base_layer {
-    display-name = "Base";
+  &ERGOL_BASE {
     bindings = <SELENIUM_KEYMAP_BINDINGS(
       &kp LTOP   ,  &kp Q  &kp C  &kp O  &kp P  &kp W   ,   &kp J  &kp M  &kp D  &apos  &kp Y  ,  &kp RTOP   ,
       &kp LHOME  ,  &H4 A  &H3 S  &H2 E  &H1 N  &kp F   ,   &kp L  &H1 R  &H2 T  &H3 I  &H4 U  ,  &kp RHOME  ,

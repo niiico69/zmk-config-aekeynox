@@ -4,20 +4,34 @@
  * Layers
  */
 
+// Runtime native/emulation toggle: the emulated ErgoL base is slipped in at
+// index 1, just above the native base, so any functional layer outranks it.
+#ifdef KB_DUAL_NATIVE_EMUL
+  #ifndef KB_EMULATION_ERGOL
+    #error "KB_DUAL_NATIVE_EMUL requires KB_EMULATION_ERGOL"
+  #endif
+  #define EMUL_BASE_LAYER 1
+  #define LAYER_SHIFT     1
+  #define MODE_TOGGLE     &tog EMUL_BASE_LAYER
+#else
+  #define LAYER_SHIFT     0
+  #define MODE_TOGGLE     &none
+#endif
+
 // Human-readable constants for the layer indexes.
 // Make sure to update this table if you edit the order / number of layers in the keymap.
 #define BASE_LAYER     0
-#define NUM_LOCK_LAYER 1
-#define SYMBOLS_LAYER  2
-#define VIM_NAV_LAYER  3
-#define NAV_NUM_LAYER  4
-#define CALLUM_LAYER   5
-#define NUM_ROW_LAYER  6
-#define FN_MEDIA_LAYER 7
+#define NUM_LOCK_LAYER (1 + LAYER_SHIFT)
+#define SYMBOLS_LAYER  (2 + LAYER_SHIFT)
+#define VIM_NAV_LAYER  (3 + LAYER_SHIFT)
+#define NAV_NUM_LAYER  (4 + LAYER_SHIFT)
+#define CALLUM_LAYER   (5 + LAYER_SHIFT)
+#define NUM_ROW_LAYER  (6 + LAYER_SHIFT)
+#define FN_MEDIA_LAYER (7 + LAYER_SHIFT)
 
 // Potentially used by other keymaps deriving from this one, who may add extra layers.
 // Make sure this stays equal to <index_of_last_layer> + 1
-#define EXTRA_LAYERS_START_INDEX 8
+#define EXTRA_LAYERS_START_INDEX (8 + LAYER_SHIFT)
 
 
 /**
@@ -155,6 +169,15 @@
 #define EZ_SL(layer)  bsl (layer) (layer)
 #define EZ_SK(mod)    bsk (mod) (mod)
 #define EZ_LSK(mod)   lbsk (mod) (mod)
+
+// AltGr on the Nav thumbs. EZ_LSK goes back to BASE_LAYER, which would also
+// drop the emulated base; on macOS the keyboard self-emulates AltGr through
+// the symbols layer instead, so no layer switch is needed.
+#ifdef MACOS
+  #define NAV_ALTGR &sym_shift_altgr
+#else
+  #define NAV_ALTGR &EZ_LSK(RALT)
+#endif
 &sl { ignore-modifiers; }; // keep one-shot-mods when chained into a one-shot-layer
 &sk { quick-release; };    // must-have! (lots of false positives otherwise)
 
