@@ -81,8 +81,17 @@
 // #define KB_EMULATION_COLEMAK          // host: QWERTY
 // #define KB_EMULATION_COLEMAK_DH       // host: QWERTY
 // #define KB_EMULATION_DVORAK           // host: QWERTY
-// #define KB_EMULATION_ERGOL            // host: QWERTY-intl or AZERTY
+#define KB_EMULATION_ERGOL               // host: QWERTY-intl or AZERTY
 // #define KB_EMULATION_QWERTY_LAFAYETTE // host: QWERTY-intl or AZERTY
+
+// [Experimental]
+// Uncomment the following line to toggle the ErgoL emulation at runtime,
+// with a key on the FnMedia layer (top row, inner left):
+//  - native (default): QWERTY key codes, the host does the layout
+//    (e.g. plain AZERTY, or ErgoL with the ErgoL driver installed);
+//  - emulation: the keyboard types ErgoL itself, no driver needed.
+// Requires KB_EMULATION_ERGOL. Layer state is volatile: a reboot lands on native.
+#define KB_DUAL_NATIVE_EMUL
 
 // [Experimental]
 // Uncomment the following line for an extended character support on Windows.
